@@ -17,6 +17,7 @@ import { Textarea } from "./ui/textarea";
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
 
 export default function NewTodoDialog() {
   const [open, setOpen] = useState<boolean>(false);
@@ -25,11 +26,14 @@ export default function NewTodoDialog() {
 
   const addTask = useMutation(api.tasks.addTask);
 
+  const closeWait = () => new Promise(resolve => setTimeout(resolve, 500));
+
   const handleSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
 
     if (title === "") {
-      throw Error("title can't be blank");
+      // throw Error("title can't be blank");
+      toast.error("`title` field can't be blank");
       return;
     }
 
@@ -46,13 +50,11 @@ export default function NewTodoDialog() {
     });
   };
 
-  const closeWait = () => new Promise(resolve => setTimeout(resolve, 500));
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant='secondary' size='sm'>
-          ＋ Todo
+        <Button variant='secondary' size='sm' className='hover:outline'>
+          + Todo
         </Button>
       </DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>

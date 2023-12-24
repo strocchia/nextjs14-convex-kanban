@@ -1,10 +1,14 @@
-import Column from './column'
-import NewTodoDialog from './new-todo-dialog'
+import { ModeToggle } from "./ModeToggle";
+import Column from "./column";
+import NewTodoDialog from "./new-todo-dialog";
 
 export default function Columns() {
   return (
     <div>
-      <NewTodoDialog />
+      <div className='flex gap-4 lg:gap-12'>
+        <NewTodoDialog />
+        <ModeToggle />
+      </div>
 
       <section className='mt-10 flex gap-6 lg:gap-12'>
         <Column title='Todo' status='TODO' />
@@ -12,5 +16,5 @@ export default function Columns() {
         <Column title='Done' status='DONE' />
       </section>
     </div>
-  )
+  );
 }
