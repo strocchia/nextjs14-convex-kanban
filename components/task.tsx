@@ -1,31 +1,37 @@
-import { Status, useTaskStore } from '@/lib/store'
-import { cn } from '@/lib/utils'
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { Status } from "@/convex/tasks";
+import { useDragTaskStore } from "@/lib/dragStore";
+import { cn } from "@/lib/utils";
+import { useMutation } from "convex/react";
 
 export default function Task({
+  _id,
   id,
   title,
   description,
   status
 }: {
-  id: string
-  title: string
-  description?: string
-  status: Status
+  _id: Id<"kanban_tasks">;
+  id: string;
+  title: string;
+  description?: string;
+  status: Status;
 }) {
-  const dragTask = useTaskStore(state => state.dragTask)
-  const removeTask = useTaskStore(state => state.removeTask)
+  const onDragTask = useDragTaskStore(state => state.onDragTask);
+  const removeTask = useMutation(api.tasks.removeTask);
 
   return (
     <div
       className={cn(
-        'flex cursor-move items-start justify-between rounded-lg bg-white px-3 py-2 text-gray-900',
+        "flex cursor-move items-start justify-between rounded-lg bg-white px-3 py-2 text-gray-900",
         {
-          'border-2 border-sky-500': status === 'TODO',
-          'border-2 border-amber-500': status === 'IN_PROGRESS',
-          'border-2 border-emerald-500': status === 'DONE'
+          "border-2 border-sky-500": status === "TODO",
+          "border-2 border-dashed border-orange-500": status === "IN_PROGRESS",
+          "border-2 border-green-500 bg-gray-300": status === "DONE"
         }
       )}
-      onDragStart={() => dragTask(id)}
+      onDragStart={() => onDragTask(_id)}
       draggable
     >
       <div>
@@ -33,7 +39,7 @@ export default function Task({
         <p className='text-sm font-light text-gray-500'>{description}</p>
       </div>
 
-      <button className='cursor-pointer' onClick={() => removeTask(id)}>
+      <button className='cursor-pointer' onClick={() => removeTask({ _id })}>
         <svg
           xmlns='http://www.w3.org/2000/svg'
           viewBox='0 0 24 24'
@@ -48,5 +54,5 @@ export default function Task({
         </svg>
       </button>
     </div>
-  )
+  );
 }

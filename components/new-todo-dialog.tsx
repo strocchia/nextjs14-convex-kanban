@@ -1,48 +1,64 @@
-'use client'
+"use client";
 
-import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Textarea } from './ui/textarea'
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "./ui/textarea";
 
-import { useTaskStore } from '@/lib/store'
+import { useState } from "react";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export default function NewTodoDialog() {
-  const addTask = useTaskStore(state => state.addTask)
+  const [open, setOpen] = useState<boolean>(false);
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const addTask = useMutation(api.tasks.addTask);
 
-    const form = e.currentTarget
-    const formData = new FormData(form)
-    const { title, description } = Object.fromEntries(formData)
+  const handleSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
 
-    if (typeof title !== 'string' || typeof description !== 'string') return
+    if (title === "") {
+      throw Error("title can't be blank");
+      return;
+    }
 
-    addTask(title, description)
-  }
+    if (typeof title !== "string" || typeof description !== "string") {
+      return;
+    }
+
+    addTask({ title, description });
+
+    closeWait().then(() => {
+      setOpen(false);
+      setTitle("");
+      setDescription("");
+    });
+  };
+
+  const closeWait = () => new Promise(resolve => setTimeout(resolve, 500));
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant='secondary' size='sm'>
-          ＋ Add New Todo
+          ＋ Todo
         </Button>
       </DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>Add New Todo</DialogTitle>
-          <DialogDescription>
-            What do you want to get done today?
-          </DialogDescription>
+          <DialogTitle>Add a Todo</DialogTitle>
+          <DialogDescription>What do you want to accomplish?</DialogDescription>
         </DialogHeader>
         <form
           id='todo-form'
@@ -53,27 +69,39 @@ export default function NewTodoDialog() {
             <Input
               id='title'
               name='title'
-              placeholder='Todo title...'
-              className='col-span-4'
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              // defaultValue=''
+              placeholder='Todo title goes here...'
+              className='col-span-3'
             />
           </div>
           <div className='grid grid-cols-4 items-center gap-4'>
             <Textarea
               id='description'
               name='description'
-              placeholder='Description...'
-              className='col-span-4'
+              rows={5}
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              // defaultValue=''
+              placeholder='Describe the todo...'
+              className='col-span-3'
             />
+          </div>
+          <div className='grid grid-cols-4 items-center gap-4'>
+            <Button type='submit' size='sm' className='col-span-1'>
+              Add it
+            </Button>
           </div>
         </form>
         <DialogFooter>
-          <DialogTrigger asChild>
+          {/* <DialogTrigger asChild>
             <Button type='submit' size='sm' form='todo-form'>
               Add Todo
             </Button>
-          </DialogTrigger>
+          </DialogTrigger> */}
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

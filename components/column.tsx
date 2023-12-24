@@ -1,36 +1,37 @@
-'use client'
+"use client";
 
-import { Status, useTaskStore } from '@/lib/store'
-import Task from './task'
-import { useEffect, useMemo } from 'react'
+import Task from "./task";
+import { useEffect, useMemo } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useDragTaskStore } from "@/lib/dragStore";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function Column({
   title,
   status
 }: {
-  title: string
-  status: Status
+  title: string;
+  status: "TODO" | "IN_PROGRESS" | "DONE";
 }) {
-  const tasks = useTaskStore(state => state.tasks)
+  const tasks = useQuery(api.tasks.listTasks) || [];
+
   const filteredTasks = useMemo(
     () => tasks.filter(task => task.status === status),
     [tasks, status]
-  )
+  );
 
-  const updateTask = useTaskStore(state => state.updateTask)
-  const dragTask = useTaskStore(state => state.dragTask)
-
-  const draggedTask = useTaskStore(state => state.draggedTask)
-
-  useEffect(() => {
-    useTaskStore.persist.rehydrate()
-  }, [])
+  const draggedTask = useDragTaskStore(state => state.whichDraggedTask);
+  const onDragTask = useDragTaskStore(state => state.onDragTask);
+  const updateTask = useMutation(api.tasks.updateTask);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    if (!draggedTask) return
-    updateTask(draggedTask, status)
-    dragTask(null)
-  }
+    if (!draggedTask) return;
+    updateTask({ _id: draggedTask as Id<"kanban_tasks">, status });
+
+    // reset dragged task so you can potentially drag the next one
+    onDragTask("");
+  };
 
   return (
     <section className='h-[600px] flex-1'>
@@ -46,19 +47,19 @@ export default function Column({
             <Task key={task.id} {...task} />
           ))}
 
-          {filteredTasks.length === 0 && status === 'TODO' && (
+          {/* {filteredTasks.length === 0 && status === "TODO" && (
             <div className='mt-8 text-center text-sm text-gray-500'>
               <p>Create a new task</p>
             </div>
           )}
 
-          {tasks.length && filteredTasks.length === 0 && status !== 'TODO' ? (
+          {tasks.length && filteredTasks.length === 0 && status !== "TODO" ? (
             <div className='mt-8 text-center text-sm text-gray-500'>
               <p>Drag your tasks here</p>
             </div>
-          ) : null}
+          ) : null} */}
         </div>
       </div>
     </section>
-  )
+  );
 }
