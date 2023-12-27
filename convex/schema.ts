@@ -19,8 +19,12 @@ export default defineSchema({
     id: v.string(),
     title: v.string(),
     description: v.optional(v.string()),
-    status: StatusValidator
-  }).index("by_uuid", ["id"]),
+    status: StatusValidator,
+    listOrder: v.number()
+  })
+    .index("by_uuid", ["id"])
+    .index("by_list_order", ["listOrder"]),
+
   users: defineTable({ name: v.string(), tokenIdentifier: v.string() }).index(
     "by_token",
     ["tokenIdentifier"]

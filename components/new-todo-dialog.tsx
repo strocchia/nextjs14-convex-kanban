@@ -96,13 +96,7 @@ export default function NewTodoDialog() {
             </Button>
           </div>
         </form>
-        <DialogFooter>
-          {/* <DialogTrigger asChild>
-            <Button type='submit' size='sm' form='todo-form'>
-              Add Todo
-            </Button>
-          </DialogTrigger> */}
-        </DialogFooter>
+        <DialogFooter></DialogFooter>
       </DialogContent>
     </Dialog>
   );

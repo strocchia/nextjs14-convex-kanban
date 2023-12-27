@@ -15,14 +15,17 @@ export default function Task({
   status
 }: {
   _id: Id<"kanban_tasks">;
-  id: string;
+  id?: string;
   title: string;
   description?: string;
   status: Status;
 }) {
   const { setDraggedId } = useContext(KanbanContext);
 
-  // const onDragTask = useDragTaskStore(state => state.onDragTask);
+  const onDragStart = (id: Id<"kanban_tasks">) => {
+    setDraggedId(id);
+  };
+
   const removeTask = useMutation(api.tasks.removeTask);
 
   return (
@@ -35,7 +38,7 @@ export default function Task({
           "border-2 border-green-500 bg-gray-300": status === "DONE"
         }
       )}
-      onDragStart={() => setDraggedId(_id)}
+      onDragStart={() => onDragStart(_id)}
       draggable
     >
       <div>

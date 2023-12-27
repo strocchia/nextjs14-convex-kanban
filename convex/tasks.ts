@@ -25,6 +25,21 @@ export const listTasks = query({
   }
 });
 
+export const listByStatus = query({
+  args: { status: StatusValidator },
+  handler: async (ctx, args) => {
+    const tasks = await ctx.db
+      .query("kanban_tasks")
+      .filter(q => q.eq(q.field("status"), args.status))
+      .order("desc")
+      .collect();
+
+    // console.log(tasks);
+
+    return tasks;
+  }
+});
+
 export const addTask = mutation({
   args: {
     title: v.string(),
@@ -35,7 +50,8 @@ export const addTask = mutation({
       id: v4(),
       title: args.title,
       description: args.description ?? "",
-      status: "TODO"
+      status: "TODO",
+      listOrder: 1
     });
 
     return task;

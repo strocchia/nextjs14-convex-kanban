@@ -17,27 +17,22 @@ export default function Column({
 }) {
   const { draggedId, setDraggedId } = useContext(KanbanContext);
 
-  const tasks = useQuery(api.tasks.listTasks) || [];
+  // const tasks = useQuery(api.tasks.listTasks) || [];
 
-  const filteredTasks = useMemo(
-    () => tasks.filter(task => task.status === status),
-    [tasks, status]
+  // const filteredTasks = useMemo(
+  //   () => tasks.filter(task => task.status === status),
+  //   [tasks, status]
+  // );
+
+  const filteredTasks = useQuery(api.tasks.listByStatus, { status }) ?? [];
+  const sortedTasks = useMemo(
+    () => filteredTasks?.sort((a, b) => a.listOrder - b.listOrder),
+    [filteredTasks, status]
   );
-
-  console.log(draggedId);
-
-  // const draggedTask = useDragTaskStore(state => state.whichDraggedTask);
-  // const onDragTask = useDragTaskStore(state => state.onDragTask);
 
   const updateTask = useMutation(api.tasks.updateTask);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    // if (!draggedTask) return;
-    // updateTask({ _id: draggedTask as Id<"kanban_tasks">, status });
-
-    // // reset dragged task so you can potentially drag the next one
-    // onDragTask("");
-
     if (!draggedId) return;
 
     updateTask({
@@ -45,6 +40,7 @@ export default function Column({
       status
     });
 
+    // reset dragged ID so you can potentially drag the next one
     setDraggedId("");
   };
 
@@ -58,7 +54,7 @@ export default function Column({
         onDragOver={e => e.preventDefault()}
       >
         <div className='flex flex-col gap-4'>
-          {filteredTasks.map(task => (
+          {sortedTasks.map(task => (
             <Task key={task.id} {...task} />
           ))}
 
