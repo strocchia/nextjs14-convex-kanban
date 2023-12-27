@@ -4,6 +4,7 @@ import "./globals.css";
 import ConvexClientProvider from "@/components/ConvexClientProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { KanbanContextProvider } from "@/components/KanbanProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,7 +29,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Toaster position='bottom-right' richColors />
-          <ConvexClientProvider>{children}</ConvexClientProvider>
+          <KanbanContextProvider>
+            <ConvexClientProvider>{children}</ConvexClientProvider>
+          </KanbanContextProvider>
         </ThemeProvider>
       </body>
     </html>

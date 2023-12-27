@@ -4,6 +4,8 @@ import { Status } from "@/convex/tasks";
 import { useDragTaskStore } from "@/lib/dragStore";
 import { cn } from "@/lib/utils";
 import { useMutation } from "convex/react";
+import { useContext } from "react";
+import { KanbanContext } from "./KanbanProvider";
 
 export default function Task({
   _id,
@@ -18,7 +20,9 @@ export default function Task({
   description?: string;
   status: Status;
 }) {
-  const onDragTask = useDragTaskStore(state => state.onDragTask);
+  const { setDraggedId } = useContext(KanbanContext);
+
+  // const onDragTask = useDragTaskStore(state => state.onDragTask);
   const removeTask = useMutation(api.tasks.removeTask);
 
   return (
@@ -31,7 +35,7 @@ export default function Task({
           "border-2 border-green-500 bg-gray-300": status === "DONE"
         }
       )}
-      onDragStart={() => onDragTask(_id)}
+      onDragStart={() => setDraggedId(_id)}
       draggable
     >
       <div>

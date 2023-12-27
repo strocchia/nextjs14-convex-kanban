@@ -6,7 +6,7 @@
     "dev": "next dev",
     "dev:convex": "convex dev",
     "build": "next build",
-    "predev": "convex dev --until-success",
+    "predev:convex": "convex dev --until-success",
     "start": "next start",
     "lint": "next lint"
   },

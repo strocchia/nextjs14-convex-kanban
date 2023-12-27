@@ -1,11 +1,12 @@
 "use client";
 
 import Task from "./task";
-import { useEffect, useMemo } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useDragTaskStore } from "@/lib/dragStore";
 import { Id } from "@/convex/_generated/dataModel";
+import { KanbanContext } from "./KanbanProvider";
 
 export default function Column({
   title,
@@ -14,6 +15,8 @@ export default function Column({
   title: string;
   status: "TODO" | "IN_PROGRESS" | "DONE";
 }) {
+  const { draggedId, setDraggedId } = useContext(KanbanContext);
+
   const tasks = useQuery(api.tasks.listTasks) || [];
 
   const filteredTasks = useMemo(
@@ -21,16 +24,28 @@ export default function Column({
     [tasks, status]
   );
 
-  const draggedTask = useDragTaskStore(state => state.whichDraggedTask);
-  const onDragTask = useDragTaskStore(state => state.onDragTask);
+  console.log(draggedId);
+
+  // const draggedTask = useDragTaskStore(state => state.whichDraggedTask);
+  // const onDragTask = useDragTaskStore(state => state.onDragTask);
+
   const updateTask = useMutation(api.tasks.updateTask);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    if (!draggedTask) return;
-    updateTask({ _id: draggedTask as Id<"kanban_tasks">, status });
+    // if (!draggedTask) return;
+    // updateTask({ _id: draggedTask as Id<"kanban_tasks">, status });
 
-    // reset dragged task so you can potentially drag the next one
-    onDragTask("");
+    // // reset dragged task so you can potentially drag the next one
+    // onDragTask("");
+
+    if (!draggedId) return;
+
+    updateTask({
+      _id: draggedId as Id<"kanban_tasks">,
+      status
+    });
+
+    setDraggedId("");
   };
 
   return (
